@@ -32,15 +32,15 @@ jobs:
 
     - name: Build Images
       run: |
-        docker build -f ./client/Dockerfile -t $DOCKERHUB_USERNAME/sw-test/production/frontend ./client
-        docker build -f ./server/Dockerfile -t $DOCKERHUB_USERNAME/sw-test/production/backend ./server
-        docker build -f ./worker/Dockerfile -t $DOCKERHUB_USERNAME/sw-test/production/worker ./worker
-        docker build -f ./nginx/Dockerfile -t $DOCKERHUB_USERNAME/sw-test/production/nginx ./nginx
+        docker build -f ./client/Dockerfile -t $DOCKERHUB_USERNAME/frontend ./client
+        docker build -f ./server/Dockerfile -t $DOCKERHUB_USERNAME/backend ./server
+        docker build -f ./worker/Dockerfile -t $DOCKERHUB_USERNAME/worker ./worker
+        docker build -f ./nginx/Dockerfile -t $DOCKERHUB_USERNAME/nginx ./nginx
   
     - name: Push To Docker-Hub
       run: |
         echo $DOCKERHUB_ACCESS_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
-        docker push $DOCKERHUB_USERNAME/sw-test/production/frontend
-        docker push $DOCKERHUB_USERNAME/sw-test/production/backend
-        docker push $DOCKERHUB_USERNAME/sw-test/production/worker
-        docker push $DOCKERHUB_USERNAME/sw-test/production/nginx
+        docker push $DOCKERHUB_USERNAME/frontend
+        docker push $DOCKERHUB_USERNAME/backend
+        docker push $DOCKERHUB_USERNAME/worker
+        docker push $DOCKERHUB_USERNAME/nginx
