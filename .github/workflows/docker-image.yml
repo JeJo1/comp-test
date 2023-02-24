@@ -7,9 +7,8 @@ on:
     branches: [ "master" ]
 
 jobs:
-  Test:
+  Unit-Tests:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
 
@@ -19,14 +18,29 @@ jobs:
     - name: run frontend unit tests
       run: docker run test sh -c "CI=true npm run test"
 
-  Build:
+  Build-And-Push-To-Docker-Hub:
+    needs: Unit-Tests
+
     runs-on: ubuntu-latest
+
+    env:
+      DOCKERHUB_USERNAME: ${{ secerts.DOCKERHUB_USERNAME }}
+      DOCKERHUB_ACCESS_TOKEN: ${{ secerts.DOCKERHUB_ACCESS_TOKEN }}
+
     steps:
     - uses: actions/checkout@v3
+
     - name: Build Images
       run: |
-        docker build -f ./client/Dockerfile -t john/sw-test/production/frontend ./client
-        docker build -f ./server/Dockerfile -t john/sw-test/production/backend ./server
-        docker build -f ./worker/Dockerfile -t john/sw-test/production/worker ./worker
-        docker build -f ./nginx/Dockerfile -t john/sw-test/production/nginx ./nginx
-      
+        docker build -f ./client/Dockerfile -t $DOCKERHUB_USERNAME/sw-test/production/frontend ./client
+        docker build -f ./server/Dockerfile -t $DOCKERHUB_USERNAME/sw-test/production/backend ./server
+        docker build -f ./worker/Dockerfile -t $DOCKERHUB_USERNAME/sw-test/production/worker ./worker
+        docker build -f ./nginx/Dockerfile -t $DOCKERHUB_USERNAME/sw-test/production/nginx ./nginx
+  
+    - name: Push To Docker-Hub
+      run: |
+        echo $DOCKERHUB_ACCESS_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
+        docker push $DOCKERHUB_USERNAME/sw-test/production/frontend
+        docker push $DOCKERHUB_USERNAME/sw-test/production/backend
+        docker push $DOCKERHUB_USERNAME/sw-test/production/worker
+        docker push $DOCKERHUB_USERNAME/sw-test/production/nginx
