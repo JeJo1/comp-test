@@ -7,14 +7,27 @@ on:
     branches: [ "master" ]
 
 jobs:
-
-  build:
-
+  Test:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
+
+    - name: Build the Docker image for testing
       run: docker build -f ./client/Dockerfile.dev -t test ./client
+
     - name: run frontend unit tests
       run: docker run test sh -c "CI=true npm run test"
+
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build Images
+      run: |
+        - docker build -f ./client/Dockerfile -t john/sw-test/production/frontend ./client
+        - docker build -f ./server/Dockerfile -t john/sw-test/production/backend ./server
+        - docker build -f ./worker/Dockerfile -t john/sw-test/production/worker ./worker
+        - docker build -f ./nginx/Dockerfile -t john/sw-test/production/nginx ./nginx
+      
